@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Router from 'next/router';
 import {
   Card,
   CardBody,
@@ -9,41 +10,38 @@ import {
   Button,
 } from 'reactstrap';
 import { useUser } from '../../../lib/hooks';
-import { useRouter } from 'next/router';
 
-const LoginPage = () => {
+const SignUpPage = () => {
+  const [user, { mutate }] = useUser();
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
-  const [user, { mutate }] = useUser();
-  const router = useRouter();
 
   useEffect(() => {
-    // redirect to home if user is authenticated
-    if (user) router.push('/');
+    if (user) Router.replace('/');
   }, [user]);
 
-  const loginHandler = async e => {
+  const signUpHandler = async e => {
     e.preventDefault();
     const body = {
+      name: name,
       email: email,
       password: password,
     };
     try {
-      const res = await fetch('/api/auth', {
+      const res = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
-      if (res.status === 200) {
-        //Router.push('/');
+      if (res.status === 201) {
         const userObj = await res.json();
         mutate(userObj);
       } else {
         throw new Error(await res.text());
       }
     } catch (error) {
-      console.error('An unexpected error occurred:', error);
       setErrorMsg(error.message);
     }
   };
@@ -54,18 +52,28 @@ const LoginPage = () => {
         <Form action="/page/profile" method="POST">
           <fieldset>
             <legend className="text-primary bg-gradient-primary font-weight-bold uppercase">
-              <h3 className="mt-2 ml-3 text-light text-center">Login</h3>
+              <h3 className="mt-2 ml-3 text-light text-center">Sign Up</h3>
             </legend>
+            {errorMsg ? <p style={{ color: 'red' }}>{errorMsg}</p> : null}
             <FormGroup>
-              <Label for="exampleInputEmail3">Email address</Label>
+              <Label for="name">Name</Label>
+              <Input
+                type="text"
+                className="form-control"
+                id="name"
+                aria-describedby="nameHelp"
+                onChange={e => setName(e.target.value)}
+              />
+              <small id="nameHelp" className="form-text text-muted"></small>
+            </FormGroup>
+            <FormGroup>
+              <Label for="email">Email</Label>
               <Input
                 type="email"
                 className="form-control"
-                id="exampleInputEmail3"
-                aria-describedby="emailHelp"
+                id="email"
                 onChange={e => setEmail(e.target.value)}
               />
-              <small id="emailHelp" className="form-text text-muted"></small>
             </FormGroup>
             <FormGroup>
               <Label for="password">Password</Label>
@@ -76,25 +84,15 @@ const LoginPage = () => {
                 onChange={e => setPassword(e.target.value)}
               />
             </FormGroup>
-            <FormGroup check>
-              <Input
-                type="checkbox"
-                className="form-check-input"
-                id="exampleCheck3"
-              />
-              <Label check for="exampleCheck3">
-                Check me out
-              </Label>
-            </FormGroup>
           </fieldset>
           <Button
             color="primary"
             block
             size="lg"
             className="mt-2"
-            onClick={e => loginHandler(e)}
+            onClick={e => signUpHandler(e)}
           >
-            Submit
+            Sign Up
           </Button>
         </Form>
       </CardBody>
@@ -102,4 +100,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default SignUpPage;

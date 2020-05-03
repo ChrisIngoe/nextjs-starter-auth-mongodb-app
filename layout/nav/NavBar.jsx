@@ -1,5 +1,4 @@
-import React, { useContext } from 'react';
-import Router from 'next/router';
+import React from 'react';
 import {
   Collapse,
   Navbar,
@@ -13,28 +12,24 @@ import {
   DropdownItem,
   NavbarText,
 } from 'reactstrap';
-import UserContext from '../../components/hooks/userContext';
 import { useUser } from '../../lib/hooks';
 
 function NavBar() {
-  //const { user } = useContext(UserContext);
-  const user = useUser();
+  const [user, { mutate }] = useUser();
+  console.log(user);
 
   const logoutHandler = async e => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/logout', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+      const res = await fetch('/api/auth', {
+        method: 'DELETE',
       });
-      if (res.status === 200) {
-        Router.push('/');
+      if (res.status === 204) {
+        mutate(null);
       } else {
         throw new Error(await res.text());
       }
     } catch (error) {
-      console.error('An unexpected error occurred:', error);
       //setErrorMsg(error.message);
     }
   };
@@ -52,7 +47,7 @@ function NavBar() {
               <NavLink href="#" className="d-none d-sm-block"></NavLink>
             </NavItem>
           </Nav>
-          {user && user.username ? (
+          {user && user.name ? (
             <UncontrolledDropdown inNavbar>
               <DropdownToggle caret nav className="text-secondary">
                 <NavbarText className="align-self-center text-left font-weight-bold">
@@ -60,7 +55,7 @@ function NavBar() {
                     src="/images/profile1.jpg"
                     className="border rounded-circle img-42 img-fluid mr-1"
                   />
-                  {user.username}
+                  {user.name}
                 </NavbarText>
               </DropdownToggle>
               <DropdownMenu>
@@ -75,7 +70,7 @@ function NavBar() {
                   </NavLink>
                 </DropdownItem>
                 <DropdownItem tag="div">
-                  <NavLink href="/api/logout" className="text-dark">
+                  <NavLink onClick={logoutHandler} className="text-dark">
                     <i className="fas fa-home"></i> Logout
                   </NavLink>
                 </DropdownItem>

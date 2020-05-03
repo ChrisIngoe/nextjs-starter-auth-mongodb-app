@@ -12,7 +12,7 @@ import { useUser } from '../../lib/hooks';
 import { MENUS, SUBMENUS } from '../../constants/menus';
 
 function NavLeft(props) {
-  const user = useUser();
+  const [user, { mutate }] = useUser();
   const { activeLink } = props;
   return (
     <>
@@ -34,7 +34,7 @@ function NavLeft(props) {
           })}
         </ListGroup>
       </div>
-      {user ? (
+      {user && user[0] && user[0].name ? (
         <>
           <h4 className="headline">Private Pages</h4>
           <div className="wrapper-list-group">
