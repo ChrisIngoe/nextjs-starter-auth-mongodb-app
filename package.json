@@ -1,0 +1,43 @@
+{
+  "name": "nextjs-starter-auth-mongodb-app",
+  "version": "1.0.0",
+  "description": "Next.Js application starter",
+  "main": "index.js",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.12.1",
+    "@hapi/iron": "^6.0.0",
+    "@zeit/next-sass": "^1.0.1",
+    "bootstrap": "^4.4.1",
+    "cookie": "^0.4.1",
+    "cssnano": "^4.1.10",
+    "next": "9.3.2",
+    "next-connect": "^0.6.4",
+    "node-sass": "^4.13.1",
+    "passport": "^0.4.1",
+    "passport-local": "^1.0.0",
+    "prop-types": "^15.7.2",
+    "react": "16.12.0",
+    "react-dom": "16.12.0",
+    "reactstrap": "^8.4.1",
+    "swr": "^0.2.0"
+  },
+  "devDependencies": {
+    "prettier": "^1.19.1"
+  },
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChrisIngoe/nextjs-starter-auth-mongodb-app.git"
+  },
+  "author": "Chris Ingoe",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ChrisIngoe/nextjs-starter-auth-mongodb-app/issues"
+  },
+  "homepage": "https://github.com/ChrisIngoe/nextjs-starter-auth-mongodb-app#readme"
+}
