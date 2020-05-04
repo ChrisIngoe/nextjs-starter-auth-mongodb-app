@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   Card,
   CardBody,
@@ -30,6 +31,7 @@ const LoginPage = () => {
       password: password,
     };
     try {
+      console.log(body);
       const res = await fetch('/api/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -56,6 +58,7 @@ const LoginPage = () => {
             <legend className="text-primary bg-gradient-primary font-weight-bold uppercase">
               <h3 className="mt-2 ml-3 text-light text-center">Login</h3>
             </legend>
+            {errorMsg ? <p style={{ color: 'red' }}>{errorMsg}</p> : null}
             <FormGroup>
               <Label for="exampleInputEmail3">Email address</Label>
               <Input
@@ -96,6 +99,9 @@ const LoginPage = () => {
           >
             Submit
           </Button>
+          <Link href="/page/forgotpassword">
+            <a>Forgot password</a>
+          </Link>
         </Form>
       </CardBody>
     </Card>

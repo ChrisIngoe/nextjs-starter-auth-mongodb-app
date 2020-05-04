@@ -3,6 +3,8 @@ import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import nextConnect from 'next-connect';
 import database from '../../../../middlewares/database';
+import isEmail from 'validator/lib/isEmail';
+import normalizeEmail from 'validator/lib/normalizeEmail';
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -11,11 +13,14 @@ const handler = nextConnect();
 handler.use(database);
 
 handler.post(async (req, res) => {
-  const user = await req.db
-    .collection('users')
-    .findOne({ email: req.body.email });
+  const email = normalizeEmail(req.body.email);
+  if (!isEmail(email)) {
+    res.status(400).send('Invalid email address');
+    return;
+  }
+  const user = await req.db.collection('users').findOne({ email: email });
   if (!user) {
-    res.status(401).send('The email is not found');
+    res.status(401).send('Email address not found');
     return;
   }
   const token = crypto.randomBytes(32).toString('hex');
@@ -28,11 +33,17 @@ handler.post(async (req, res) => {
   const msg = {
     to: user.email,
     from: process.env.EMAIL_FROM,
-    subject: '[nextjs-mongodb-app] Reset your password.',
+    subject: '[nextjs-starter-auth-mongodb-app] Reset your password.',
+    text: `Hello ${user.name}
+      
+      Please follow the link below to reset your password.
+      
+      ${process.env.WEB_URI}/page/forgotpassword/${token}
+      `,
     html: `
       <div>
         <p>Hello, ${user.name}</p>
-        <p>Please follow <a href="${process.env.WEB_URI}/forget-password/${token}">this link</a> to reset your password.</p>
+        <p>Please follow <a href="${process.env.WEB_URI}/page/forgotpassword/${token}">this link</a> to reset your password.</p>
       </div>
       `,
   };
@@ -48,9 +59,9 @@ handler.put(async (req, res) => {
   }
   const { value: tokenDoc } = await req.db
     .collection('tokens')
-    .findOneAndDelete({ _id: req.body.token, type: 'passwordReset' });
+    .findOneAndDelete({ token: req.body.token, type: 'passwordReset' });
   if (!tokenDoc) {
-    req.status(403).send('This link may have been expired.');
+    res.status(403).send('The link may have expired.');
     return;
   }
   const password = await bcrypt.hash(req.body.password, 10);

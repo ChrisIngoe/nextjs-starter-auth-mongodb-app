@@ -6,10 +6,13 @@ const handler = nextConnect();
 handler.use(middleware);
 
 handler.put(async (req, res) => {
-  if (!req.user) { res.json(401).send('you need to be authenticated'); return; }
+  if (!req.user) {
+    res.json(401).send('Unauthenticated');
+    return;
+  }
   const { oldPassword, newPassword } = req.body;
   if (!(await bcrypt.compare(oldPassword, req.user.password))) {
-    res.status(401).send('The password you has entered is incorrect.');
+    res.status(401).send('Incorrect email or password');
   }
   const password = await bcrypt.hash(newPassword, 10);
   await req.db
